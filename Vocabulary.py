@@ -423,7 +423,6 @@ class Vocabulary(object):
 
 # ---------------------PREPROCESSING------------------------------
 
-
     def integrate_special_tokens(self, sentence):
         #sentence = Vocabulary.punctuate_text(sentence)
         #sentence = Vocabulary.normalize_text(sentence)
