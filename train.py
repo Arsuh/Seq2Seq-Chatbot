@@ -92,7 +92,7 @@ def train(hparams, saving=True, verbose=True):
 
 
 if __name__ == '__main__':
-    hparams = load_hyper_params('./hyper_parameters_test.json')
+    hparams = load_hyper_params(os.path.join('hyper_parameters_test.json'))
     v, dataset, enc, dec, opt = initialize_model(
         hparams, from_indexed=True, create_ds=True, de_tokenize=False, verbose=True)
 
