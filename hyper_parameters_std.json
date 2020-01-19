@@ -1,0 +1,21 @@
+{
+	"CREDENTIALS_PATH": "./credentials.json",
+
+	"VOCAB": 50000,
+	"VOCAB_DB": "no_ap",
+	"NUM_EXAMPLES": 1000000,
+	"MAX_EXAMPLES": 14759553,
+	"MAX_LEN": 50,
+
+	"EPOCHS": 5,
+	"BATCH_SIZE": 128,
+	"EMBEDDING": 256,
+	"RNN1": 512,
+	"RNN2": 512,
+	"RNN_TYPE": "lstm",
+	"DROPOUT1": 0.2,
+	"DROPOUT2": 0.2,
+	"BIDIRECTIONAL": true,
+	"MERGE_MODE": "ave",
+	"LR": 0.001
+}
