@@ -10,12 +10,12 @@
 	"EPOCHS": 5,
 	"BATCH_SIZE": 128,
 	"EMBEDDING": 256,
-	"RNN1": 512,
+	"RNN1": 1024,
 	"RNN2": 512,
 	"RNN_TYPE": "lstm",
 	"DROPOUT1": 0.2,
 	"DROPOUT2": 0.2,
 	"BIDIRECTIONAL": true,
-	"MERGE_MODE": "ave",
+	"MERGE_MODE": "mul",
 	"LR": 0.001
 }
