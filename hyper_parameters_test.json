@@ -13,8 +13,8 @@
 	"RNN1": 256,
 	"RNN2": 128,
 	"RNN_TYPE": "gru",
-	"DROPOUT1": 0.2,
-	"DROPOUT2": 0.4,
+	"DROPOUT_ENC": 0.2,
+	"DROPOUT_DEC": 0.4,
 	"BIDIRECTIONAL": true,
 	"MERGE_MODE": "mul",
 	"LR": 0.001

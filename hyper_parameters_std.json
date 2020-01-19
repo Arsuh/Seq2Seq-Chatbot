@@ -13,8 +13,8 @@
 	"RNN1": 1024,
 	"RNN2": 512,
 	"RNN_TYPE": "lstm",
-	"DROPOUT1": 0.2,
-	"DROPOUT2": 0.2,
+	"DROPOUT_ENC": 0.2,
+	"DROPOUT_DEC": 0.2,
 	"BIDIRECTIONAL": true,
 	"MERGE_MODE": "mul",
 	"LR": 0.001
