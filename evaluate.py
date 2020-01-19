@@ -13,11 +13,12 @@ def evaluate(text, v, enc, dec):
     result = ''
     h1, h2 = enc.initialize_hidden(batch=1)
 
-    enc_out, h1, h2 = enc.call(inp, h1, h2)
+    enc_out, h1, h2 = enc.call(inp, h1, h2, training=False)
     dec_inp = tf.expand_dims([1], axis=0)  # SOS
     result += '<SOS> '
     for _ in range(v.max_len):
-        pred, h1, h2, attention_wieghts = dec.call(dec_inp, enc_out, h1, h2)
+        pred, h1, h2, attention_wieghts = dec.call(
+            dec_inp, enc_out, h1, h2, training=False)
 
         pred = tf.nn.softmax(pred, axis=1)
         pred_id = tf.argmax(pred[0]).numpy()
