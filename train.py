@@ -30,12 +30,12 @@ def train_step(hparams, inp, tar, enc_h1, enc_h2):
             loss += loss_fnc(tar[:, t], pred)
             dec_inp = tf.expand_dims(tar[:, t], 1)
 
-        batch_loss = (loss/int(tar.shape[1]))
-        variables = enc.trainable_variables + dec.trainable_variables
-        gradients = tape.gradient(loss, variables)
-        opt.apply_gradients(zip(gradients, variables))
+    batch_loss = (loss/int(tar.shape[1]))
+    variables = enc.trainable_variables + dec.trainable_variables
+    gradients = tape.gradient(loss, variables)
+    opt.apply_gradients(zip(gradients, variables))
 
-        return batch_loss
+    return batch_loss
 
 
 test_sentences = ['Hello!',

@@ -226,7 +226,7 @@ def lstm_fnc(units, dropout, inverse=False):
 
 
 _loss = tf.keras.losses.SparseCategoricalCrossentropy(
-    from_logits=False, reduction='none')
+    from_logits=True, reduction='none')
 
 
 def loss_fnc(y_true, y_pred):
