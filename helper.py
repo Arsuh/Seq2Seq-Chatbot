@@ -69,7 +69,7 @@ def create_dataset(v, batch_size, buffer_size):
 
 
 def save_plot(path, plt_loss):
-    if not os.path.isdir(path+'/'):
-        os.mkdir(path+'/')
-    with open(path + '/plot.txt', 'a', encoding='utf-8') as f:
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    with open(path + 'plot.txt', 'a', encoding='utf-8') as f:
         f.write(str(plt_loss[-1].numpy()) + '\n')

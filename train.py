@@ -10,7 +10,7 @@ from MainModel import loss_fnc
 from helper import initialize_model, load_hyper_params, save_plot
 from Vocabulary import Vocabulary
 
-ckpt_path = './checkpoints'
+ckpt_path = './checkpoints/'
 #enc_prefix = os.path.join(ckpt_path+'/enc', 'ckpt-{epoch}')
 #dec_prefix = os.path.join(ckpt_path+'/dec', 'ckpt-{epoch}')
 ckpt_prefix = os.path.join(ckpt_path, 'ckpt')
