@@ -98,7 +98,7 @@ if __name__ == '__main__':
     v, dataset, enc, dec, opt = initialize_model(
         hparams, from_indexed=True, create_ds=True, de_tokenize=False, verbose=True)
 
-    plt_loss = train(hparams, saving=True, plot_saving=True)
+    plt_loss = train(hparams, saving=False, plot_saving=False)
 
     plt.plot(plt_loss)
     plt.ylabel('loss')
