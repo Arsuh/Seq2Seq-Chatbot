@@ -16,8 +16,7 @@ class Encoder(tf.keras.Model):
 
         self.vocab_sz = vocab_sz + 4
         self.batch_sz = batch_sz
-        self.construct_model(_emb, _rnn1, _rnn2, _rnn_type,
-                             bidirectional, _merge_mode, _dr)
+        self.construct_model(_emb, _rnn1, _rnn2, _rnn_type, bidirectional, _merge_mode, _dr)
         # self.build(tf.TensorShape([self.batch_sz, None]))
 
     def construct_model(self, _emb, _rnn1, _rnn2, _rnn_type, bidirectional, _merge_mode, _dr):
@@ -76,13 +75,11 @@ class Encoder(tf.keras.Model):
 
         if self.rnn_type == 'gru' and self.bidirectional == False:
             output1, state1 = self.rnn1(x, initial_state=h1, training=training)
-            output2, state2 = self.rnn2(
-                self.W(output1), initial_state=h2, training=training)
+            output2, state2 = self.rnn2(self.W(output1), initial_state=h2, training=training)
             return output2, state1, state2
 
         output1 = self.rnn1(x, initial_state=h1, training=training)
-        output2 = self.rnn2(
-            self.W(output1[0]), initial_state=h2, training=training)
+        output2 = self.rnn2(self.W(output1[0]), initial_state=h2, training=training)
         # result, h1, h2
         return output2[0], output1[1] + output1[2], output2[1] + output2[2]
 
@@ -136,8 +133,7 @@ class Decoder(tf.keras.Model):
                 'RNN TYPE not recognized! Plase use \'gru\' or \'lstm\'!')
 
         self.W = tf.keras.layers.Dense(self.rnn1_units)
-        self.attention = BahdanauAttention(
-            self.batch_sz, self.rnn1_units, self.rnn2_units)
+        self.attention = BahdanauAttention(self.batch_sz, self.rnn1_units, self.rnn2_units)
         self.fc = tf.keras.layers.Dense(self.vocab_sz)
         #self.final = tf.keras.layers.Dense(self.vocab_sz, activation='softmax')
 
@@ -174,8 +170,7 @@ class BahdanauAttention(tf.keras.layers.Layer):
         h2_expand = tf.expand_dims(h2, axis=1)
 
         x = self.W_enc(output)
-        concat_rnns = tf.concat(
-            (self.W2(h2_expand), self.W1(h1_expand)), axis=2)
+        concat_rnns = tf.concat((self.W2(h2_expand), self.W1(h1_expand)), axis=2)
         x = BahdanauAttention.broadcast(x, concat_rnns.shape)
 
         score = self.W(tf.tanh(x + concat_rnns))

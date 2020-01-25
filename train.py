@@ -56,8 +56,7 @@ def train(hparams, saving=True, plot_saving=True, verbose=True):
         N_BATCH = hparams['NUM_EXAMPLES'] // hparams['BATCH_SIZE']
 
     if saving:
-        checkpoint = tf.train.Checkpoint(
-            optimizer=opt, encoder=enc, decoder=dec)
+        checkpoint = tf.train.Checkpoint(optimizer=opt, encoder=enc, decoder=dec)
 
     plt_loss = []
     for epoch in range(1, hparams['EPOCHS']+1):
@@ -98,7 +97,7 @@ if __name__ == '__main__':
     v, dataset, enc, dec, opt = initialize_model(
         hparams, from_indexed=True, create_ds=True, de_tokenize=False, verbose=True)
 
-    plt_loss = train(hparams, saving=False, plot_saving=True)
+    plt_loss = train(hparams, saving=False, plot_saving=False)
 
     plt.plot(plt_loss)
     plt.ylabel('loss')

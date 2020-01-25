@@ -61,8 +61,7 @@ def load_hyper_params(path):
 
 def create_dataset(v, batch_size, buffer_size):
     v.tokenize_data()
-    dataset = tf.data.Dataset.from_tensor_slices(
-        (np.array(v.inp, dtype=np.int32), np.array(v.tar, dtype=np.int32)))
+    dataset = tf.data.Dataset.from_tensor_slices((np.array(v.inp, dtype=np.int32), np.array(v.tar, dtype=np.int32)))
     dataset = dataset.shuffle(buffer_size)
     dataset = dataset.batch(batch_size, drop_remainder=True)
     return dataset
