@@ -1,9 +1,6 @@
 import tensorflow as tf
 import numpy as np
 
-from helper import load_hyper_params, initialize_model
-from Vocabulary import Vocabulary
-
 
 def evaluate(text, v, enc, dec):
     inp = np.array(v.preproc(text), dtype=np.float32)

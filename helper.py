@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import json
 import time
+import os
 
 from Vocabulary import Vocabulary
 from MainModel import Encoder, Decoder
@@ -65,3 +66,10 @@ def create_dataset(v, batch_size, buffer_size):
     dataset = dataset.shuffle(buffer_size)
     dataset = dataset.batch(batch_size, drop_remainder=True)
     return dataset
+
+
+def save_plot(path, plt_loss):
+    if not os.path.isdir(path+'/'):
+        os.mkdir(path+'/')
+    with open(path + '/plot.txt', 'a', encoding='utf-8') as f:
+        f.write(str(plt_loss[-1].numpy()) + '\n')

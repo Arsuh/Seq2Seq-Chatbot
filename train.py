@@ -7,7 +7,7 @@ import random
 
 from evaluate import evaluate
 from MainModel import loss_fnc
-from helper import initialize_model, load_hyper_params
+from helper import initialize_model, load_hyper_params, save_plot
 from Vocabulary import Vocabulary
 
 ckpt_path = './checkpoints'
@@ -48,7 +48,7 @@ test_sentences = ['Hello!',
                   'My name is Thomas!']
 
 
-def train(hparams, saving=True, verbose=True):
+def train(hparams, saving=True, plot_saving=True, verbose=True):
     global v, dataset, enc, dec, opt
     if hparams['NUM_EXAMPLES'] == None:
         N_BATCH = hparams['MAX_EXAMPLES'] // hparams['BATCH_SIZE']
@@ -88,6 +88,8 @@ def train(hparams, saving=True, verbose=True):
         if saving:
             print('Saving model...')
             checkpoint.save(file_prefix=ckpt_prefix)
+        if plot_saving:
+            save_plot(ckpt_path, plt_loss)
     return plt_loss
 
 
@@ -96,7 +98,7 @@ if __name__ == '__main__':
     v, dataset, enc, dec, opt = initialize_model(
         hparams, from_indexed=True, create_ds=True, de_tokenize=False, verbose=True)
 
-    plt_loss = train(hparams, saving=False)
+    plt_loss = train(hparams, saving=False, plot_saving=True)
 
     plt.plot(plt_loss)
     plt.ylabel('loss')
