@@ -1,7 +1,7 @@
 from google.cloud import bigquery
 import re
 import os
-
+#import sqlite3
 
 class Vocabulary(object):
     PAD = '<PAD>'  # INDEX: 0
@@ -24,6 +24,7 @@ class Vocabulary(object):
 
         for nr, word in enumerate(Vocabulary.special_tokens):
             self.word2idx[word] = nr
+            # self.word_occurrence[word] = 9999999999
             self.idx2word[nr] = word
 
 # -------------------MAIN-FUNCTIONS-------------------------
@@ -420,8 +421,33 @@ class Vocabulary(object):
             print('Main Loaded!')
         return v
 
+    def load_vocab_from_local(self, c, limit=None, verbose=True):
+        query = 'SELECT * FROM vocabulary_no_ap_indexed ORDER BY occurrence DESC'
+        if limit != None: query += ' LIMIT {}'.format(limit)
+
+        c.execute(query)
+        i = 1
+        rows = c.fetchall()
+        try:
+            for row in rows:
+                word = str(row[0])
+                occ = int(row[1])
+                idx = int(row[2])
+                self.word_occurrence[word] = occ
+                self.word2idx[word] = idx
+                self.idx2word[idx] = word
+
+                if verbose and i % 200000 == 0:
+                    print('   >>> {} rows done!'.format(i))
+                i += 1
+
+            if verbose:
+                print('Word occurrence created!')
+        except Exception as e:
+            print(e)
 
 # ---------------------PREPROCESSING------------------------------
+
 
     def integrate_special_tokens(self, sentence):
         #sentence = Vocabulary.punctuate_text(sentence)
@@ -504,3 +530,31 @@ class Vocabulary(object):
             else:
                 text = "{} . ".format(text)
         return text
+
+    @staticmethod
+    def restore_text(text, rm_initial_tokens=True):
+        if rm_initial_tokens:
+            text = text[6:-6]
+           
+        text = text.replace('<UNK>', '')
+        if text[0] == ' ': text = text[1:]
+        result = ''
+        for word in text.split(' '):
+            if word in ['0','1','2','3','4','5','6','7','8','9'] and result[-1] in ['0','1','2','3','4','5','6','7','8','9']:
+                result += word
+                continue
+            result += ' ' + word
+        
+        result = result[1:]
+        first = result[0].upper()
+        result = result[1:]
+        result = first + result
+
+        result = result.replace(' .', '.')
+        result = result.replace(' !', '!')
+        result = result.replace(' ?', '?')
+        result = result.replace(' %', '%')
+        result = result.replace(' <APOSTROPHE> ', "'")
+        result = result.replace(' <QUOTE> ', '"')
+        result = result.replace(' i ', ' I ')
+        return result

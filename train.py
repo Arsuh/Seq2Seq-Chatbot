@@ -4,16 +4,16 @@ import numpy as np
 import time
 import os
 import random
+from shutil import copyfile
 
 from evaluate import evaluate
 from MainModel import loss_fnc
 from helper import initialize_model, load_hyper_params, save_plot
 from Vocabulary import Vocabulary
 
-ckpt_path = './checkpoints'
-#enc_prefix = os.path.join(ckpt_path+'/enc', 'ckpt-{epoch}')
-#dec_prefix = os.path.join(ckpt_path+'/dec', 'ckpt-{epoch}')
+ckpt_path = './checkpoints/'
 ckpt_prefix = os.path.join(ckpt_path, 'ckpt')
+hparams_path = './hyper_parameters_test.json'
 
 
 def train_step(hparams, inp, tar, enc_h1, enc_h2):
@@ -56,8 +56,8 @@ def train(hparams, saving=True, plot_saving=True, verbose=True):
         N_BATCH = hparams['NUM_EXAMPLES'] // hparams['BATCH_SIZE']
 
     if saving:
-        checkpoint = tf.train.Checkpoint(
-            optimizer=opt, encoder=enc, decoder=dec)
+        checkpoint = tf.train.Checkpoint(optimizer=opt, encoder=enc, decoder=dec)
+        copyfile(hparams_path, ckpt_path + '/hparams.json')
 
     plt_loss = []
     for epoch in range(1, hparams['EPOCHS']+1):
@@ -76,8 +76,8 @@ def train(hparams, saving=True, plot_saving=True, verbose=True):
         plt_loss.append(total_loss/N_BATCH)
 
         sentences = random.choices(test_sentences, k=2)
-        result1, text1, _ = evaluate(sentences[0], v, enc, dec)
-        result2, text2, _ = evaluate(sentences[1], v, enc, dec)
+        result1, text1, _ = evaluate(sentences[0], v, enc, dec, hparams['MAX_LEN'])
+        result2, text2, _ = evaluate(sentences[1], v, enc, dec, hparams['MAX_LEN'])
         print(50*'+')
         print(text1)
         print(result1)
@@ -94,11 +94,11 @@ def train(hparams, saving=True, plot_saving=True, verbose=True):
 
 
 if __name__ == '__main__':
-    hparams = load_hyper_params(os.path.join('hyper_parameters_test.json'))
+    hparams = load_hyper_params(os.path.join(hparams_path))
     v, dataset, enc, dec, opt = initialize_model(
         hparams, from_indexed=True, create_ds=True, de_tokenize=False, verbose=True)
 
-    plt_loss = train(hparams, saving=False, plot_saving=True)
+    plt_loss = train(hparams, saving=False, plot_saving=False)
 
     plt.plot(plt_loss)
     plt.ylabel('loss')
