@@ -14,10 +14,10 @@ class AppWindow(object):
     initial_height = 559
 
     hparams_path = './checkpoints/hparams.json'
-    #ckpt_path = './checkpoints/ckeckpoints-125ep-3/'
-    #ckpt_number = 'ckpt-5'
-    ckpt_path = './checkpoints/ckeckpoints-final-2/'
-    ckpt_number = 'ckpt-2'
+    ckpt_path = './checkpoints/checkpoints-125ep-3/'
+    ckpt_number = 'ckpt-5'
+    #ckpt_path = './checkpoints/checkpoints-final-2/'
+    #ckpt_number = 'ckpt-2'
     vocab_path = './vocab/vocabulary_no_ap_indexed.db'
 
     def __init__(self):
