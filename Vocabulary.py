@@ -3,6 +3,7 @@ import re
 import os
 #import sqlite3
 
+
 class Vocabulary(object):
     PAD = '<PAD>'  # INDEX: 0
     SOS = '<SOS>'  # INDEX: 1
@@ -312,12 +313,15 @@ class Vocabulary(object):
             print(e)
 
     def load_bigquery_vocab_from_indexed(self, credentials, vocab='no_ap', limit=None, verbose=True):
+        '''
         if vocab == 'no_ap':
             query = 'SELECT * FROM `reddit-chatobot.Reddit_db.vocab_no_ap_indexed`'
         elif vocab == 'ap':
             query = 'SELECT * FROM `reddit-chatobot.Reddit_db.vocab_ap_indexed`'
         else:
             raise Exception('Unknown vocab argument! Use \'no_ap\' or \'ap\'!')
+        '''
+        query = 'SELECT * FROM `reddit-chatobot.Reddit_dbV2.full_vocabulary_validated`'
 
         if limit != None:
             query += ' LIMIT {}'.format(limit)
@@ -422,8 +426,10 @@ class Vocabulary(object):
         return v
 
     def load_vocab_from_local(self, c, limit=None, verbose=True):
-        query = 'SELECT * FROM vocabulary_no_ap_indexed ORDER BY occurrence DESC'
-        if limit != None: query += ' LIMIT {}'.format(limit)
+        #query = 'SELECT * FROM vocabulary_no_ap_indexed ORDER BY occurrence DESC'
+        query = 'SELECT * FROM full_vocabulary_validated ORDER BY occurrence DESC'
+        if limit != None:
+            query += ' LIMIT {}'.format(limit)
 
         c.execute(query)
         i = 1
@@ -447,7 +453,6 @@ class Vocabulary(object):
             print(e)
 
 # ---------------------PREPROCESSING------------------------------
-
 
     def integrate_special_tokens(self, sentence):
         #sentence = Vocabulary.punctuate_text(sentence)
@@ -535,16 +540,17 @@ class Vocabulary(object):
     def restore_text(text, rm_initial_tokens=True):
         if rm_initial_tokens:
             text = text[6:-6]
-           
+
         text = text.replace('<UNK>', '')
-        if text[0] == ' ': text = text[1:]
+        if text[0] == ' ':
+            text = text[1:]
         result = ''
         for word in text.split(' '):
-            if word in ['0','1','2','3','4','5','6','7','8','9'] and result[-1] in ['0','1','2','3','4','5','6','7','8','9']:
+            if word in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] and result[-1] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
                 result += word
                 continue
             result += ' ' + word
-        
+
         result = result[1:]
         first = result[0].upper()
         result = result[1:]
