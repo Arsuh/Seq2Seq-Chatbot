@@ -43,7 +43,7 @@ test_sentences = ['Hello!',
                   'Tomorow is my birthday, but I keep feeling sad...',
                   'What is your name sir?',
                   'Artificial intelligence will take over the world some day!',
-                  'Can you please bing me some water?',
+                  'Can you please bring me some water?',
                   'Come on! This is the easiest thing you are supposed to do!',
                   'My name is Thomas!']
 
