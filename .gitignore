@@ -1,6 +1,7 @@
 __pycache__/
 
 Seq2Seq.ipynb
+Seq2SeqV2.ipynb
 
 hyper_parameters_test.json
 hyper_parameters_std.json
