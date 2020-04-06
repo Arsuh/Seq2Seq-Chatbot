@@ -1,12 +1,12 @@
-from Vocabulary import Vocabulary
-from evaluate import evaluate
-from helper import load_hyper_params, initialize_model_from_local, plot_attention
 import tkinter as tk
 import tensorflow as tf
 
 import sys
 import os
 sys.path.append(os.path.abspath('./'))
+from helper import load_hyper_params, initialize_model_from_local, plot_attention
+from evaluate import evaluate
+from Vocabulary import Vocabulary
 
 
 class AppWindow(object):
