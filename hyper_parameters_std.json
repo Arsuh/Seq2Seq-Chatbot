@@ -19,6 +19,6 @@
 	"MERGE_MODE": "mul",
 	"LR": 0.001,
 
-	"TRAINING_MODE": "single",
-	"OFFSET_REP": "5"
+	"TRAINING_MODE": "multi",
+	"OFFSET_REP": "max"
 }

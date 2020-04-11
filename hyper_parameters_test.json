@@ -20,5 +20,5 @@
 	"LR": 0.001,
 
 	"TRAINING_MODE": "multi",
-	"OFFSET_REP": "5"
+	"OFFSET_REP": "2"
 }
