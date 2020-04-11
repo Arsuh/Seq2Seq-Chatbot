@@ -51,7 +51,7 @@ test_sentences = ['Hello!',
                   'Come on! This is the easiest thing you are supposed to do!',
                   'My name is Thomas!']
 
-def train(hparams, credentials, offset=0, saving=True, verbose=True):
+def train(hparams, credentials, offset=0, saving=True, checkpoint_prefix=ckpt_prefix, verbose=True):
     global enc, dec, opt
     start = time.time()
     v = Vocabulary(max_len=hparams['MAX_LEN'])
@@ -59,7 +59,7 @@ def train(hparams, credentials, offset=0, saving=True, verbose=True):
     v.create_inputs_from_indexed(credentials,
                                  offset=offset,
                                  limit_main=hparams['NUM_EXAMPLES'],
-                                 verbose=True)  # <--- False
+                                 verbose=True)
 
     if verbose: print('Vocabulary created!')
     dataset = create_dataset(v, hparams['BATCH_SIZE'], hparams['NUM_EXAMPLES'])
@@ -101,11 +101,11 @@ def train(hparams, credentials, offset=0, saving=True, verbose=True):
 
         if saving:
             print('Saving model...')
-            checkpoint.save(file_prefix=ckpt_prefix)
+            checkpoint.save(file_prefix=checkpoint_prefix)
 
     return plt_loss
 
-def multi_initializer_train(hparams, credentials, saving=True, verbose=True):
+def multi_initializer_train(hparams, credentials, saving=True, checkpoint_prefix=ckpt_prefix, verbose=True):
     global enc, dec, opt
     v = Vocabulary(max_len=hparams['MAX_LEN'])
     v.load_bigquery_vocab_from_indexed(credentials, hparams['VOCAB_DB'], hparams['VOCAB'], verbose)
@@ -155,13 +155,13 @@ def multi_initializer_train(hparams, credentials, saving=True, verbose=True):
 
         if saving:
             print('Saving model...')
-            checkpoint.save(file_prefix=ckpt_prefix)
+            checkpoint.save(file_prefix=checkpoint_prefix)
     return plt_loss
 
 
 if __name__ == '__main__':
     if os.path.isdir('./__pycache__/'): shutil.rmtree(path='./__pycache__/', ignore_errors=True, onerror=None)
-
+    
     hparams = load_hyper_params('./hyper_parameters_test.json')
     credentials = service_account.Credentials.from_service_account_file(hparams['CREDENTIALS_PATH'])
     enc, dec, opt = create_model(hparams)
