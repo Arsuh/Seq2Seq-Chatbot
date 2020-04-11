@@ -17,5 +17,8 @@
 	"DROPOUT_DEC": 0.2,
 	"BIDIRECTIONAL": true,
 	"MERGE_MODE": "mul",
-	"LR": 0.001
+	"LR": 0.001,
+
+	"TRAINING_MODE": "single",
+	"OFFSET_REP": "5"
 }

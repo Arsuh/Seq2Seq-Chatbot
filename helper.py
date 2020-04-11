@@ -1,4 +1,3 @@
-from google.oauth2 import service_account
 import tensorflow as tf
 import numpy as np
 import json
@@ -14,44 +13,13 @@ from MainModel import Encoder, Decoder
 from evaluate import evaluate
 
 
-def initialize_model(hparams, from_indexed=True, create_ds=True, de_tokenize=False, verbose=False):
-    start = time.time()
-    if from_indexed:
-        v = Vocabulary.create_inputs_from_indexed(service_account.Credentials.from_service_account_file(hparams['CREDENTIALS_PATH']),
-                                                  max_len=hparams['MAX_LEN'],
-                                                  vocab=hparams['VOCAB_DB'],
-                                                  limit_main=hparams['NUM_EXAMPLES'],
-                                                  limit_vocab=hparams['VOCAB'],
-                                                  verbose=True)  # <--- False
-    else:
-        v = Vocabulary.create_inputs(service_account.Credentials.from_service_account_file(hparams['CREDENTIALS_PATH']),
-                                     max_len=hparams['MAX_LEN'],
-                                     vocab=hparams['VOCAB_DB'],
-                                     limit_main=hparams['NUM_EXAMPLES'],
-                                     limit_vocab=hparams['VOCAB'],
-                                     verbose=True)  # <--- False
-
-    if de_tokenize:
-        v.de_tokenize_data()
-    if verbose:
-        print('Vocabulary created!')
-
-    if create_ds:
-        dataset = create_dataset(v, hparams['BATCH_SIZE'], hparams['NUM_EXAMPLES'])
-
-    enc = Encoder(hparams['VOCAB'], hparams['BATCH_SIZE'], hparams['EMBEDDING'],
-                  hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['BIDIRECTIONAL'], hparams['MERGE_MODE'], hparams['DROPOUT_ENC'])
-    dec = Decoder(hparams['VOCAB'], hparams['BATCH_SIZE'], hparams['EMBEDDING'],
-                  hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['DROPOUT_DEC'])
-    opt = tf.keras.optimizers.Adam(learning_rate=hparams['LR'])
-    #opt = tf.keras.optimizers.SGD(learning_rate=hparams['LR'], momentum=0.5)
-
-    print('Time to initialize model {:.2f} min | {:.2f} hrs\n'.format(
-        (time.time()-start)/60, (time.time()-start)/3600))
-
-    if create_ds:
-        return v, dataset, enc, dec, opt
-    return v, enc, dec, opt
+def reinitialize_vocab(v, hparams, credentials, offset, verbose=False):
+    #tf.keras.backend.clear_session()
+    v.remove_inputs()
+    v.create_inputs_from_indexed(credentials, offset=offset, limit_main=hparams['NUM_EXAMPLES'], verbose=verbose)
+    dataset = create_dataset(v, hparams['BATCH_SIZE'], hparams['NUM_EXAMPLES'])
+    if verbose: print('Vocabulary reinitialized!')
+    return v, dataset
 
 def initialize_model_from_local(path, hparams, de_tokenize=False, verbose=False):
     start = time.time()
@@ -66,26 +34,27 @@ def initialize_model_from_local(path, hparams, de_tokenize=False, verbose=False)
     if de_tokenize: v.de_tokenize_data()
     if verbose: print('Vocabulary created!')
 
-    enc = Encoder(hparams['VOCAB'], hparams['BATCH_SIZE'], hparams['EMBEDDING'],
-                  hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['BIDIRECTIONAL'], hparams['MERGE_MODE'], hparams['DROPOUT_ENC'])
-    dec = Decoder(hparams['VOCAB'], hparams['BATCH_SIZE'], hparams['EMBEDDING'],
-                  hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['DROPOUT_DEC'])
-    opt = tf.keras.optimizers.Adam(learning_rate=hparams['LR'])
-    #opt = tf.keras.optimizers.SGD(learning_rate=hparams['LR'], momentum=0.5)
+    enc, dec, opt = create_model(hparams)
 
-    print('Time to initialize model {:.2f} min | {:.2f} hrs\n'.format(
-        (time.time()-start)/60, (time.time()-start)/3600))
+    print('Time to initialize model {:.2f} min | {:.2f} hrs\n'.format((time.time()-start)/60, (time.time()-start)/3600))
     return v, enc, dec, opt
 
 def load_hyper_params(path):
-    with open(path, 'r') as f:
-        data = json.load(f)
+    with open(path, 'r') as f: data = json.load(f)
 
     for k in data:
         if data[k] == 'None':
             data[k] = None
     return data
 
+def create_model(hparams):
+    enc = Encoder(hparams['VOCAB'], hparams['BATCH_SIZE'], hparams['EMBEDDING'],
+                  hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['BIDIRECTIONAL'], hparams['MERGE_MODE'], hparams['DROPOUT_ENC'])
+    dec = Decoder(hparams['VOCAB'], hparams['BATCH_SIZE'], hparams['EMBEDDING'],
+                  hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['DROPOUT_DEC'])
+    opt = tf.keras.optimizers.Adam(learning_rate=hparams['LR'])
+    #opt = tf.keras.optimizers.SGD(learning_rate=hparams['LR'], momentum=0.5)
+    return enc, dec, opt
 
 def create_dataset(v, batch_size, buffer_size):
     v.tokenize_data()
@@ -117,3 +86,28 @@ def plot_attention(attention, sentence, predicted_sentence):
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
     plt.show()
+
+#------------------------ Legacy ---------------------------
+def initialize_model(v, hparams, credentials, offset=0, from_indexed=True, create_ds=True, de_tokenize=False, verbose=False):
+    start = time.time()
+    if not v.vocab_load: v.load_bigquery_vocab_from_indexed(credentials, hparams['VOCAB_DB'], hparams['VOCAB'], verbose)
+
+    if from_indexed: v.create_inputs_from_indexed(credentials,
+                                                  offset=offset,
+                                                  limit_main=hparams['NUM_EXAMPLES'],
+                                                  verbose=True)  # <--- False
+    else: v.create_inputs(credentials,
+                          offset=offset,
+                          limit_main=hparams['NUM_EXAMPLES'],
+                          verbose=True)  # <--- False
+
+    if verbose: print('Vocabulary created!')
+
+    if create_ds: dataset = create_dataset(v, hparams['BATCH_SIZE'], hparams['NUM_EXAMPLES'])
+    enc, dec, opt = create_model(hparams)
+
+    if de_tokenize: v.de_tokenize_data()
+    print('Time to initialize model {:.2f} min | {:.2f} hrs\n'.format((time.time()-start)/60, (time.time()-start)/3600))
+
+    if create_ds: return v, dataset, enc, dec, opt
+    return v, enc, dec, opt

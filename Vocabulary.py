@@ -3,7 +3,6 @@ import re
 import os
 #import sqlite3
 
-
 class Vocabulary(object):
     PAD = '<PAD>'  # INDEX: 0
     SOS = '<SOS>'  # INDEX: 1
@@ -18,6 +17,7 @@ class Vocabulary(object):
         self.word_occurrence = {}
         self.current_index = 4
         self.dict_size = dictionary_size
+        self.vocab_load = False
 
         self.inp = []
         self.tar = []
@@ -79,6 +79,11 @@ class Vocabulary(object):
         for itm in rem:
             del self.word_occurrence[itm]
 
+    def remove_inputs(self):
+        self.inp = []
+        self.tar = []
+        self.tokenized = False
+
     def size(self):
         return len(self.word_occurrence)
 
@@ -114,16 +119,15 @@ class Vocabulary(object):
 
         enc_text = []
         for word in dec_text.split(' '):
-            if word in self.word_occurrence:
-                enc_text.append(self.word2idx[word])
-            elif word in Vocabulary.special_tokens:
+            if word in Vocabulary.special_tokens:
                 enc_text.append(Vocabulary.special_tokens.index(word))
+            elif word in self.word_occurrence:
+                enc_text.append(self.word2idx[word])
 
         return enc_text
 
     def pad_text(self, enc_text):
-        while len(enc_text) < self.max_len:
-            enc_text.append(0)  # PAD
+        while len(enc_text) < self.max_len: enc_text.append(0)  # PAD
         return enc_text
 
     def get_final_text(self, enc_text):
@@ -256,8 +260,7 @@ class Vocabulary(object):
         sz = self.size()
         self.current_index = sz + 1
         # vocabulary.dict_size = sz
-        if verbose:
-            self.print_data()
+        if verbose: self.print_data()
 
     def load_bigquery_main(self, credentials, limit=None, verbose=True):
         query = 'SELECT parent, comment FROM `reddit-chatobot.Reddit_db.mainTable`'
@@ -292,8 +295,7 @@ class Vocabulary(object):
         else:
             raise Exception('Unknown vocab argument! Use \'no_ap\' or \'ap\'!')
 
-        if limit != None:
-            query += ' LIMIT {}'.format(limit)
+        if limit != None: query += ' LIMIT {}'.format(limit)
 
         i = 1
         rows = Vocabulary.create_query(query, credentials)
@@ -307,10 +309,9 @@ class Vocabulary(object):
                     print('   >>> {} rows done!'.format(i))
                 i += 1
 
-            if verbose:
-                print('Word occurrence created!')
-        except Exception as e:
-            print(e)
+            self.vocab_load = True
+            if verbose: print('Word occurrence created!')
+        except Exception as e: print(e)
 
     def load_bigquery_vocab_from_indexed(self, credentials, vocab='no_ap', limit=None, verbose=True):
         '''
@@ -341,6 +342,7 @@ class Vocabulary(object):
                     print('   >>> {} rows done!'.format(i))
                 i += 1
 
+            self.vocab_load = True
             if verbose:
                 print('Word occurrence created!')
         except Exception as e:
@@ -357,28 +359,21 @@ class Vocabulary(object):
             v.print_data()
         return v
 
-    @staticmethod
-    def create_inputs(credentials, max_len=150, vocab='no_ap', limit_main=None, limit_vocab=None, verbose=True):
-        v = Vocabulary(max_len=max_len)
-        v.load_bigquery_vocab(credentials, vocab, limit_vocab, verbose)
-
+    def create_inputs(self, credentials, offset=0, limit_main=None, verbose=True):
         query = 'SELECT * FROM `reddit-chatobot.Reddit_db.inputs`'
-        if limit_main != None:
-            query += ' LIMIT {}'.format(limit_main)
+        if limit_main != None: query += ' LIMIT {} OFFSET {}'.format(limit_main, offset)
 
         i = 1
         text = set()
         rows = Vocabulary.create_query(query, credentials)
         for row in rows:
             parent = str(row.parent)
-            v.inp.append(parent)
-            for word in parent.split(' '):
-                text.add(word)
+            self.inp.append(parent)
+            for word in parent.split(' '): text.add(word)
 
             comment = str(row.comment)
-            v.tar.append(comment)
-            for word in comment.split(' '):
-                text.add(word)
+            self.tar.append(comment)
+            for word in comment.split(' '): text.add(word)
 
             if verbose and i % 1000000 == 0:
                 # os.system('clear')
@@ -386,50 +381,36 @@ class Vocabulary(object):
 
             i += 1
 
-        v.add_words(text)
+        self.add_words(text)
         del text
+        if verbose: print('Main Loaded!')
 
-        if verbose:
-            print('Main Loaded!')
-        return v
-
-    @staticmethod
-    def create_inputs_from_indexed(credentials, max_len=150, vocab='no_ap', limit_main=None, limit_vocab=None, verbose=True):
-        v = Vocabulary(max_len=max_len)
-        v.load_bigquery_vocab_from_indexed(
-            credentials, vocab, limit_vocab, verbose)
-
+    def create_inputs_from_indexed(self, credentials, offset=0, limit_main=None, verbose=True):
         #query = 'SELECT * FROM `reddit-chatobot.Reddit_db.inputs` WHERE LENGTH(comment)>25 AND LENGTH(parent)>25'
         query = 'SELECT * FROM `reddit-chatobot.Reddit_db.inputs`'
-        if limit_main != None:
-            query += ' LIMIT {}'.format(limit_main)
+        if limit_main != None: query += ' LIMIT {} OFFSET {}'.format(limit_main, offset)
 
         i = 1
         rows = Vocabulary.create_query(query, credentials)
         for row in rows:
             parent = str(row.parent)
-            v.inp.append(parent)
+            self.inp.append(parent)
 
             comment = str(row.comment)
-            v.tar.append(comment)
+            self.tar.append(comment)
 
             if verbose and i % 1000000 == 0:
                 # os.system('clear')
                 print('   >>> Main: {} rows done!'.format(i))
 
             i += 1
-
-        v.current_index = i
-
-        if verbose:
-            print('Main Loaded!')
-        return v
+        self.current_index = i
+        if verbose: print('Main Loaded!')
 
     def load_vocab_from_local(self, c, limit=None, verbose=True):
         #query = 'SELECT * FROM vocabulary_no_ap_indexed ORDER BY occurrence DESC'
         query = 'SELECT * FROM full_vocabulary_validated ORDER BY occurrence DESC'
-        if limit != None:
-            query += ' LIMIT {}'.format(limit)
+        if limit != None: query += ' LIMIT {}'.format(limit)
 
         c.execute(query)
         i = 1
@@ -453,6 +434,7 @@ class Vocabulary(object):
             print(e)
 
 # ---------------------PREPROCESSING------------------------------
+
 
     def integrate_special_tokens(self, sentence):
         #sentence = Vocabulary.punctuate_text(sentence)
@@ -540,17 +522,17 @@ class Vocabulary(object):
     def restore_text(text, rm_initial_tokens=True):
         if rm_initial_tokens:
             text = text[6:-6]
-
+           
         text = text.replace('<UNK>', '')
-        if text[0] == ' ':
-            text = text[1:]
+        text = re.sub(r' +', ' ', text)
+        if text[0] == ' ': text = text[1:]
         result = ''
         for word in text.split(' '):
-            if word in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] and result[-1] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+            if word in ['0','1','2','3','4','5','6','7','8','9'] and result[-1] in ['0','1','2','3','4','5','6','7','8','9']:
                 result += word
                 continue
             result += ' ' + word
-
+        
         result = result[1:]
         first = result[0].upper()
         result = result[1:]

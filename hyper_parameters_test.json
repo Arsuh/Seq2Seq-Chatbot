@@ -4,10 +4,10 @@
 	"VOCAB": 5000,
 	"VOCAB_DB": "no_ap",
 	"NUM_EXAMPLES": 1000,
-	"MAX_EXAMPLES": 14759553,
+	"MAX_EXAMPLES": 14700000,
 	"MAX_LEN": 10,
 
-	"EPOCHS": 200,
+	"EPOCHS": 100,
 	"BATCH_SIZE": 100,
 	"EMBEDDING": 32,
 	"RNN1": 256,
@@ -17,5 +17,8 @@
 	"DROPOUT_DEC": 0.4,
 	"BIDIRECTIONAL": true,
 	"MERGE_MODE": "mul",
-	"LR": 0.001
+	"LR": 0.001,
+
+	"TRAINING_MODE": "multi",
+	"OFFSET_REP": "5"
 }
