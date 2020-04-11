@@ -10,7 +10,7 @@ from google.oauth2 import service_account
 
 from evaluate import evaluate
 from MainModel import loss_fnc
-from helper import initialize_model, load_hyper_params, reinitialize_vocab, create_dataset, create_model
+from helper import initialize_model, load_hyper_params, reinitialize_vocab, create_dataset, create_model, save_plot
 from Vocabulary import Vocabulary
 
 ckpt_path = './checkpoints'
@@ -75,6 +75,7 @@ def train(hparams, credentials, offset=0, saving=True, checkpoint_prefix=ckpt_pr
 
     plt_loss = []
     for epoch in range(1, hparams['EPOCHS']+1):
+        epoch_time = time.time()
         h1, h2 = enc.initialize_hidden()
 
         total_loss = 0
@@ -85,9 +86,6 @@ def train(hparams, credentials, offset=0, saving=True, checkpoint_prefix=ckpt_pr
 
             print('  >>> Epoch: {} | Batch: {}\\{} | Loss: {:.4f} | Time: {:.2f} sec'
                   .format(epoch, batch+1, N_BATCH, batch_loss, time.time() - batch_time))
-
-        print('Epoch: {} | Loss: {:.4f}'.format(epoch+1, total_loss/N_BATCH))
-        plt_loss.append(total_loss/N_BATCH)
 
         sentences = random.choices(test_sentences, k=2)
         result1, text1, _ = evaluate(sentences[0], v, enc, dec, hparams['MAX_LEN'])
@@ -102,6 +100,9 @@ def train(hparams, credentials, offset=0, saving=True, checkpoint_prefix=ckpt_pr
         if saving:
             print('Saving model...')
             checkpoint.save(file_prefix=checkpoint_prefix)
+
+        plt_loss.append(total_loss/N_BATCH)
+        print('Epoch: {} | Loss: {:.4f} | Time: {:.2f} min'.format(epoch, total_loss/N_BATCH, (time.time()-epoch_time)/60))
 
     return plt_loss
 
@@ -120,6 +121,7 @@ def multi_initializer_train(hparams, credentials, saving=True, checkpoint_prefix
 
     plt_loss = []
     for epoch in range(1, hparams['EPOCHS']+1):
+        epoch_time = time.time()
         h1, h2 = enc.initialize_hidden()
 
         reps = int(hparams['MAX_EXAMPLES']//hparams['NUM_EXAMPLES']) if hparams['OFFSET_REP']=='max' else int(hparams['OFFSET_REP'])
@@ -138,10 +140,7 @@ def multi_initializer_train(hparams, credentials, saving=True, checkpoint_prefix
             
             offset += hparams['NUM_EXAMPLES']
             tf.keras.backend.clear_session()
-            print(' >>> Rep: {} done!'.format(rep + 1))
-
-        print('Epoch: {} | Loss: {:.4f}'.format(epoch, total_loss/(N_BATCH*reps)))
-        plt_loss.append(total_loss/N_BATCH)
+            print(' -> Rep: {} done!'.format(rep + 1))
 
         sentences = random.choices(test_sentences, k=2)
         result1, text1, _ = evaluate(sentences[0], v, enc, dec, hparams['MAX_LEN'])
@@ -156,12 +155,17 @@ def multi_initializer_train(hparams, credentials, saving=True, checkpoint_prefix
         if saving:
             print('Saving model...')
             checkpoint.save(file_prefix=checkpoint_prefix)
+
+        plt_loss.append(total_loss/N_BATCH)
+        print('Epoch: {} | Loss: {:.4f} | Time: {:.2f} min'.format(epoch, total_loss/(N_BATCH*reps), (time.time()-epoch_time)/60))
+
     return plt_loss
 
 
 if __name__ == '__main__':
     if os.path.isdir('./__pycache__/'): shutil.rmtree(path='./__pycache__/', ignore_errors=True, onerror=None)
-    
+   
+
     hparams = load_hyper_params('./hyper_parameters_test.json')
     credentials = service_account.Credentials.from_service_account_file(hparams['CREDENTIALS_PATH'])
     enc, dec, opt = create_model(hparams)
