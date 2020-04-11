@@ -51,7 +51,7 @@ test_sentences = ['Hello!',
                   'Come on! This is the easiest thing you are supposed to do!',
                   'My name is Thomas!']
 
-def train(hparams, offset=0, saving=True, verbose=True):
+def train(hparams, credentials, offset=0, saving=True, verbose=True):
     global enc, dec, opt
     start = time.time()
     v = Vocabulary(max_len=hparams['MAX_LEN'])
@@ -105,7 +105,7 @@ def train(hparams, offset=0, saving=True, verbose=True):
 
     return plt_loss
 
-def multi_initializer_train(hparams, saving=True, verbose=True):
+def multi_initializer_train(hparams, credentials, saving=True, verbose=True):
     global enc, dec, opt
     v = Vocabulary(max_len=hparams['MAX_LEN'])
     v.load_bigquery_vocab_from_indexed(credentials, hparams['VOCAB_DB'], hparams['VOCAB'], verbose)
@@ -161,17 +161,13 @@ def multi_initializer_train(hparams, saving=True, verbose=True):
 
 if __name__ == '__main__':
     if os.path.isdir('./__pycache__/'): shutil.rmtree(path='./__pycache__/', ignore_errors=True, onerror=None)
-    
-    #hparams = load_hyper_params(os.path.join('hyper_parameters_test.json'))
-    #hparams = load_hyper_params('./drive_checkpoints/big_training/hparams.json')
 
     hparams = load_hyper_params('./hyper_parameters_test.json')
     credentials = service_account.Credentials.from_service_account_file(hparams['CREDENTIALS_PATH'])
-    #v = Vocabulary(max_len=hparams['MAX_LEN'])
     enc, dec, opt = create_model(hparams)
 
-    if hparams['TRAINING_MODE'] == 'single': plt_loss = train(hparams, saving=False)
-    elif hparams['TRAINING_MODE'] == 'multi': plt_loss = multi_initializer_train(hparams, saving=False)
+    if hparams['TRAINING_MODE'] == 'single': plt_loss = train(hparams, credentials, saving=False)
+    elif hparams['TRAINING_MODE'] == 'multi': plt_loss = multi_initializer_train(hparams, credentials, saving=False)
     else: raise Exception('Please enter a valid TRAINING_MODE: \'single\' or \'multi\' '
                           '(for \'multi\' please use OFFSET_REP >= 2 or \'max\')')  
     
