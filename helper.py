@@ -52,8 +52,8 @@ def create_model(hparams):
                   hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['BIDIRECTIONAL'], hparams['MERGE_MODE'], hparams['DROPOUT_ENC'])
     dec = Decoder(hparams['VOCAB'], hparams['BATCH_SIZE'], hparams['EMBEDDING'],
                   hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['DROPOUT_DEC'])
-    opt = tf.keras.optimizers.Adam(learning_rate=hparams['LR'])
-    #opt = tf.keras.optimizers.SGD(learning_rate=hparams['LR'], momentum=0.5)
+    #opt = tf.keras.optimizers.Adam(learning_rate=hparams['LR'])
+    opt = tf.keras.optimizers.SGD(learning_rate=hparams['LR'], momentum=0.3)
     return enc, dec, opt
 
 def create_dataset(v, batch_size, buffer_size):
