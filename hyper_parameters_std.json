@@ -19,7 +19,7 @@
 	"MERGE_MODE": "mul",
 	"LR": 0.001,
 	"MOMENTUM": 0.0,
-	"CLIPNORM": None,
+	"CLIPNORM": "None",
 
 	"TRAINING_MODE": "multi",
 	"OFFSET_REP": "max"
