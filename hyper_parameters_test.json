@@ -18,6 +18,8 @@
 	"BIDIRECTIONAL": true,
 	"MERGE_MODE": "mul",
 	"LR": 0.001,
+	"MOMENTUM": 0.0,
+	"CLIPNORM": "None",
 
 	"TRAINING_MODE": "multi",
 	"OFFSET_REP": "2"
