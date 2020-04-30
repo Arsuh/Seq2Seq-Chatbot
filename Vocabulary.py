@@ -408,8 +408,8 @@ class Vocabulary(object):
         if verbose: print('Main Loaded!')
 
     def load_vocab_from_local(self, c, limit=None, verbose=True):
-        #query = 'SELECT * FROM vocabulary_no_ap_indexed ORDER BY occurrence DESC'
-        query = 'SELECT * FROM full_vocabulary_validated ORDER BY occurrence DESC'
+        query = 'SELECT * FROM vocabulary_no_ap_indexed ORDER BY occurrence DESC'
+        #query = 'SELECT * FROM full_vocabulary_validated ORDER BY occurrence DESC'
         if limit != None: query += ' LIMIT {}'.format(limit)
 
         c.execute(query)
@@ -520,18 +520,21 @@ class Vocabulary(object):
 
     @staticmethod
     def restore_text(text, rm_initial_tokens=True):
-        if rm_initial_tokens:
-            text = text[6:-6]
+        if rm_initial_tokens: text = text[6:-6]
            
         text = text.replace('<UNK>', '')
         text = re.sub(r' +', ' ', text)
         if text[0] == ' ': text = text[1:]
         result = ''
+
         for word in text.split(' '):
-            if word in ['0','1','2','3','4','5','6','7','8','9'] and result[-1] in ['0','1','2','3','4','5','6','7','8','9']:
+            if (len(result) > 0 and
+                    word in ['0','1','2','3','4','5','6','7','8','9'] and 
+                    result[-1] in ['0','1','2','3','4','5','6','7','8','9']):
                 result += word
                 continue
             result += ' ' + word
+        
         
         result = result[1:]
         first = result[0].upper()
