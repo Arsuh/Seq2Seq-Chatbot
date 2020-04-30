@@ -3,6 +3,7 @@ import tensorflow as tf
 
 import sys
 import os
+import shutil
 sys.path.append(os.path.abspath('./'))
 from helper import load_hyper_params, initialize_model_from_local, plot_attention
 from evaluate import evaluate
@@ -10,14 +11,14 @@ from Vocabulary import Vocabulary
 
 
 class AppWindow(object):
-    initial_width = 460
-    initial_height = 559
+    initial_width = 465
+    initial_height = 645
 
     hparams_path = './checkpoints/hparams.json'
-    ckpt_path = './checkpoints/checkpoints-125ep-3/'
-    ckpt_number = 'ckpt-5'
-    #ckpt_path = './checkpoints/checkpoints-final-2/'
-    #ckpt_number = 'ckpt-2'
+    #ckpt_path = './checkpoints/checkpoints-125ep-3/'
+    #ckpt_number = 'ckpt-5'
+    ckpt_path = './checkpoints/checkpoints-final-2/'
+    ckpt_number = 'ckpt-2'
     #vocab_path = './vocab/vocabulary_no_ap_indexed.db'
     vocab_path = './vocab/full_vocab_validated.db'
 
@@ -34,18 +35,17 @@ class AppWindow(object):
         self.root.geometry(str(self.initial_width)+'x'+str(self.initial_height))
         self.root.resizable(False, False)
         self.root.bind('<Return>', self.get_result)
-
+        
         chat_frame = tk.Frame(self.root, width=self.initial_width, height=self.initial_height)  # , bg='blue')
         chat_frame.pack()
         inp_frame = tk.Frame(self.root, width=self.initial_width, height=50)  # , bg='red')
         inp_frame.pack()
         att_frame = tk.Frame(self.root, width=self.initial_width, height=25)  # , bg='green')
         att_frame.pack()
-
+        
         self.scrollbar = tk.Scrollbar(chat_frame)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.display_text = tk.Text(chat_frame, yscrollcommand=self.scrollbar, font=(
-            'Helvetica', 10), width=60, height=33, bd=1, relief='solid', padx=5, pady=10)
+        self.display_text = tk.Text(chat_frame, yscrollcommand=self.scrollbar, font=('Helvetica', 10), width=60, height=33, bd=1, relief='solid', padx=5, pady=10)
         self.display_text.pack(padx=5, pady=5)
         self.scrollbar.config(command=self.display_text.yview)
 
@@ -66,19 +66,20 @@ class AppWindow(object):
         self.reset_button.pack_forget()
 
         self.display_text.config(state=tk.NORMAL)
-        self.display_text.insert(tk.END, 'Loading model...')
+        self.display_text.insert(tk.END,'Loading model...')
         self.display_text.config(state=tk.DISABLED)
         self.root.update_idletasks()
         self.root.update()
 
+
     def load_model(self):
         self.hparams = load_hyper_params(self.hparams_path)
-        self.v, self.enc, self.dec, self.opt = initialize_model_from_local(
-            self.vocab_path, self.hparams, de_tokenize=False, verbose=False)
+        self.v, self.enc, self.dec, self.opt = initialize_model_from_local(self.vocab_path, self.hparams, de_tokenize=False, verbose=False)
         checkpoint = tf.train.Checkpoint(optimizer=self.opt, encoder=self.enc, decoder=self.dec)
         checkpoint.restore(self.ckpt_path + self.ckpt_number).expect_partial()
         _, _, _ = evaluate(u'test', self.v, self.enc, self.dec, self.hparams['MAX_LEN'])
 
+    
     def get_result(self, event=None):
         inp = self.entry.get()
         if self.mode == 'chat':
@@ -86,7 +87,7 @@ class AppWindow(object):
                 self.entry.set('')
                 self.output, self.input, attention_plot = evaluate(inp, self.v, self.enc, self.dec, self.hparams['MAX_LEN'])
                 self.attention_weights = attention_plot[:len(self.output.split(' ')), :len(self.input.split(' '))]
-
+                
                 res = Vocabulary.restore_text(self.output)
                 self.update_label(inp, res)
                 self.display_text.config(state=tk.NORMAL)
@@ -110,7 +111,7 @@ class AppWindow(object):
             self.display_text.see(tk.END)
 
             self.auto_inp = res
-
+  
     def update_label(self, inp, result):
         if self.mode == 'chat':
             self.text_history.append('-> YOU: ' + inp + '\n')
@@ -160,4 +161,7 @@ class AppWindow(object):
 
 
 if __name__ == '__main__':
+    if os.path.isdir('./__pycache__/'): shutil.rmtree(path='./__pycache__/', ignore_errors=True, onerror=None)
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
     AppWindow().start()
