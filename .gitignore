@@ -1,4 +1,5 @@
 __pycache__/
+.vscode/
 
 Seq2Seq.ipynb
 Seq2SeqV2.ipynb
