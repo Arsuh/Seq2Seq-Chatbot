@@ -72,7 +72,7 @@ def save_plot(path, plt_loss):
 
 
 def plot_attention(attention, sentence, predicted_sentence):
-    fig = plt.figure(figsize=(10,10))
+    fig = plt.figure(figsize=(10,10), num='Attention Mechanism')
     #fig.suptitle('Attention weights')
     ax = fig.add_subplot(1, 1, 1)
     ax.matshow(attention, cmap='viridis')
