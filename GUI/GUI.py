@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.ttk as ttk
 import tensorflow as tf
 
 import sys
@@ -15,10 +16,10 @@ class AppWindow(object):
     initial_height = 645
 
     hparams_path = './checkpoints/hparams.json'
-    #ckpt_path = './checkpoints/checkpoints-125ep-3/'
-    #ckpt_number = 'ckpt-5'
-    ckpt_path = './checkpoints/checkpoints-final-2/'
-    ckpt_number = 'ckpt-2'
+    ckpt_path = './checkpoints/checkpoints-125ep-3/'
+    ckpt_number = 'ckpt-5'
+    #ckpt_path = './checkpoints/checkpoints-final-2/'
+    #ckpt_number = 'ckpt-2'
     #vocab_path = './vocab/vocabulary_no_ap_indexed.db'
     vocab_path = './vocab/full_vocab_validated.db'
 
@@ -31,37 +32,42 @@ class AppWindow(object):
         self.auto_inp = None
 
         self.root = tk.Tk()
+        self.root.style = ttk.Style()
+        self.root.style.theme_use('clam')
+
+        self.root.iconphoto(True, tk.PhotoImage(file='./GUI/icon.png'))
         self.root.title('Seq2Seq Chatbot')
         self.root.geometry(str(self.initial_width)+'x'+str(self.initial_height))
         self.root.resizable(False, False)
         self.root.bind('<Return>', self.get_result)
         
-        chat_frame = tk.Frame(self.root, width=self.initial_width, height=self.initial_height)  # , bg='blue')
+        chat_frame = ttk.Frame(self.root, width=self.initial_width, height=self.initial_height)  # , bg='blue')
         chat_frame.pack()
-        inp_frame = tk.Frame(self.root, width=self.initial_width, height=50)  # , bg='red')
+        inp_frame = ttk.Frame(self.root, width=self.initial_width, height=50)  # , bg='red')
         inp_frame.pack()
-        att_frame = tk.Frame(self.root, width=self.initial_width, height=25)  # , bg='green')
+        att_frame = ttk.Frame(self.root, width=self.initial_width, height=25)  # , bg='green')
         att_frame.pack()
         
-        self.scrollbar = tk.Scrollbar(chat_frame)
+
+        self.scrollbar = ttk.Scrollbar(chat_frame)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.display_text = tk.Text(chat_frame, yscrollcommand=self.scrollbar, font=('Helvetica', 10), width=60, height=33, bd=1, relief='solid', padx=5, pady=10)
         self.display_text.pack(padx=5, pady=5)
         self.scrollbar.config(command=self.display_text.yview)
 
         self.entry = tk.StringVar()
-        self.entry_w = tk.Entry(inp_frame, state=tk.DISABLED, width=45, textvariable=self.entry)
+        self.entry_w = ttk.Entry(inp_frame, state=tk.DISABLED, width=45, textvariable=self.entry)
         self.entry_w.pack(side=tk.LEFT, padx=4)
-        self.main_button = tk.Button(inp_frame, text='Send', command=lambda: self.get_result(None), width=5)
+        self.main_button = ttk.Button(inp_frame, text='Send', command=lambda: self.get_result(None), width=5)
         self.main_button.pack(side=tk.LEFT, padx=8, pady=4)
 
         self.label_text = tk.StringVar()
         tk.Label(att_frame, width=20, textvariable=self.label_text, anchor=tk.W).pack(side=tk.LEFT)
-        self.auto_button = tk.Button(att_frame, text='Automate Chat', command=self.auto_button_fnc, width=10)
+        self.auto_button = ttk.Button(att_frame, text='Auto Chat', command=self.auto_button_fnc, width=10)
         self.auto_button.pack(side=tk.RIGHT, padx=3)
-        att_buton = tk.Button(att_frame, text='Show Attention', command=self.attention_button_fnc)
+        att_buton = ttk.Button(att_frame, text='Show Attention', command=self.attention_button_fnc)
         att_buton.pack(side=tk.RIGHT, padx=3)
-        self.reset_button = tk.Button(att_frame, text='Reset', command=self.reset_button_fnc)
+        self.reset_button = ttk.Button(att_frame, text='Reset', command=self.reset_button_fnc)
         self.reset_button.pack(side=tk.RIGHT)
         self.reset_button.pack_forget()
 
