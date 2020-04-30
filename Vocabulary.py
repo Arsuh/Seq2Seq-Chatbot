@@ -537,7 +537,7 @@ class Vocabulary(object):
         
         
         result = result[1:]
-        if len(result) <= 2: return 'You have bested me... I\'ll keep training :))'
+        if len(result) <= 2: return 'You have bested me... I\'ll keep on training :))'
         first = result[0].upper()
         result = result[1:]
         result = first + result
