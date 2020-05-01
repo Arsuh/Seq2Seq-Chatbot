@@ -52,8 +52,9 @@ def create_model(hparams):
                   hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['BIDIRECTIONAL'], hparams['MERGE_MODE'], hparams['DROPOUT_ENC'])
     dec = Decoder(hparams['VOCAB'], hparams['BATCH_SIZE'], hparams['EMBEDDING'],
                   hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['DROPOUT_DEC'])
-    #opt = tf.keras.optimizers.Adam(learning_rate=hparams['LR'])
-    opt = tf.keras.optimizers.SGD(learning_rate=hparams['LR'], momentum=hparams['MOMENTUM'], clipnorm=hparams['CLIPNORM'])
+    if hparams['OPTIMIZER'] == 'adam': opt = tf.keras.optimizers.Adam(learning_rate=hparams['LR'])
+    elif hparams['OPTIMIZER'] == 'sgd': opt = tf.keras.optimizers.SGD(learning_rate=hparams['LR'], momentum=hparams['MOMENTUM'], clipnorm=hparams['CLIPNORM'])
+    else raise Exception('Please enter a valid OPTIMIZER: \'adam\' or \'sgd\'')
     return enc, dec, opt
 
 def create_dataset(v, batch_size, buffer_size):
