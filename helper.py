@@ -54,7 +54,7 @@ def create_model(hparams):
                   hparams['RNN1'], hparams['RNN2'], hparams['RNN_TYPE'], hparams['DROPOUT_DEC'])
     if hparams['OPTIMIZER'] == 'adam': opt = tf.keras.optimizers.Adam(learning_rate=hparams['LR'])
     elif hparams['OPTIMIZER'] == 'sgd': opt = tf.keras.optimizers.SGD(learning_rate=hparams['LR'], momentum=hparams['MOMENTUM'], clipnorm=hparams['CLIPNORM'])
-    else raise Exception('Please enter a valid OPTIMIZER: \'adam\' or \'sgd\'')
+    else: raise Exception('Please enter a valid OPTIMIZER: \'adam\' or \'sgd\'')
     return enc, dec, opt
 
 def create_dataset(v, batch_size, buffer_size):
