@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 
 paths = ['./checkpoints/checkpoints-125ep-3/',
-         './checkpoints/checkpoints-final-2/']
+         './checkpoints/checkpoints-final-2/',
+         './']
 
 def load_data():
     sessions = []
@@ -17,6 +18,18 @@ def load_data():
             print(e)
     return sessions
 
+'''
+def load_data():
+    sessions = []
+    session = []
+    with open('./plot.txt', 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+        for line in lines:
+            session.append(float(line))
+        sessions.append(session)
+
+    return sessions
+'''
 if __name__ == '__main__':
     sessions = load_data()
 

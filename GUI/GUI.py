@@ -20,8 +20,8 @@ class AppWindow(object):
     ckpt_number = 'ckpt-5'
     #ckpt_path = './checkpoints/checkpoints-final-2/'
     #ckpt_number = 'ckpt-2'
-    #vocab_path = './vocab/vocabulary_no_ap_indexed.db'
-    vocab_path = './vocab/full_vocab_validated.db'
+    vocab_path = './vocab/vocabulary_no_ap_indexed.db'
+    #vocab_path = './vocab/full_vocab_validated.db'
 
     def __init__(self):
         self.text_history = []
