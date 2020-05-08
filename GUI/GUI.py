@@ -63,7 +63,7 @@ class AppWindow(object):
 
         self.label_text = tk.StringVar()
         tk.Label(att_frame, width=20, textvariable=self.label_text, anchor=tk.W).pack(side=tk.LEFT)
-        self.auto_button = ttk.Button(att_frame, text='Auto Chat', command=self.auto_button_fnc, width=10)
+        self.auto_button = ttk.Button(att_frame, text='Auto Chat', command=self.auto_button_fnc, width=11)
         self.auto_button.pack(side=tk.RIGHT, padx=3)
         att_buton = ttk.Button(att_frame, text='Show Attention', command=self.attention_button_fnc)
         att_buton.pack(side=tk.RIGHT, padx=3)
