@@ -408,8 +408,8 @@ class Vocabulary(object):
         if verbose: print('Main Loaded!')
 
     def load_vocab_from_local(self, c, limit=None, verbose=True):
-        #query = 'SELECT * FROM vocabulary_no_ap_indexed ORDER BY occurrence DESC'
-        query = 'SELECT * FROM full_vocabulary_validated ORDER BY occurrence DESC'
+        query = 'SELECT * FROM vocabulary_no_ap_indexed ORDER BY occurrence DESC'
+        #query = 'SELECT * FROM full_vocabulary_validated ORDER BY occurrence DESC'
         if limit != None: query += ' LIMIT {}'.format(limit)
 
         c.execute(query)
