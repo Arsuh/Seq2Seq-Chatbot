@@ -1,5 +1,5 @@
 {
-	"CREDENTIALS_PATH": "./credentials.json",
+	"CREDENTIALS_PATH": "./guest_credentials.json",
 
 	"VOCAB": 5000,
 	"VOCAB_DB": "no_ap",
