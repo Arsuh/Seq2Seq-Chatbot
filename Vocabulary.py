@@ -322,8 +322,8 @@ class Vocabulary(object):
         else:
             raise Exception('Unknown vocab argument! Use \'no_ap\' or \'ap\'!')
         '''
-        #query = 'SELECT * FROM `reddit-chatobot.Reddit_dbV2.full_vocabulary_validated`'
-        query = 'SELECT * FROM `reddit-chatobot.Reddit_db.vocab_no_ap_indexed`'
+        query = 'SELECT * FROM `reddit-chatobot.Reddit_dbV2.full_vocabulary_validated`'
+        #query = 'SELECT * FROM `reddit-chatobot.Reddit_db.vocab_no_ap_indexed`'
 
         if limit != None:
             query += ' LIMIT {}'.format(limit)

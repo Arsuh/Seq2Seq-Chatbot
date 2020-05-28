@@ -22,6 +22,6 @@
 	"MOMENTUM": 0.0,
 	"CLIPNORM": "None",
 
-	"TRAINING_MODE": "multi",
+	"TRAINING_MODE": "single",
 	"OFFSET_REP": "2"
 }
